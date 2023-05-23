@@ -1,4 +1,4 @@
-﻿ using UnityEngine;
+﻿using UnityEngine;
 #if ENABLE_INPUT_SYSTEM 
 using UnityEngine.InputSystem;
 #endif
@@ -106,6 +106,7 @@ namespace StarterAssets
         private StarterAssetsInputs _input;
         private GameObject _mainCamera;
 
+
         private const float _threshold = 0.01f;
 
         private bool _hasAnimator;
@@ -122,6 +123,8 @@ namespace StarterAssets
             }
         }
 
+        Vector3 targetPosition;
+        private Navigatior navigatior;
 
         private void Awake()
         {
@@ -132,10 +135,15 @@ namespace StarterAssets
             }
         }
 
+        private bool cursorLocked = true;
+        private bool controllersEnabled = true;
+        [Header("NavMeshAgent")]
+        public UnityEngine.AI.NavMeshAgent navMeshAgent;
+
         private void Start()
         {
             _cinemachineTargetYaw = CinemachineCameraTarget.transform.rotation.eulerAngles.y;
-            
+
             _hasAnimator = TryGetComponent(out _animator);
             _controller = GetComponent<CharacterController>();
             _input = GetComponent<StarterAssetsInputs>();
@@ -150,15 +158,75 @@ namespace StarterAssets
             // reset our timeouts on start
             _jumpTimeoutDelta = JumpTimeout;
             _fallTimeoutDelta = FallTimeout;
+
+            UpdateCursorLock();
+            navMeshAgent = GetComponent<UnityEngine.AI.NavMeshAgent>();
+            navigatior = GetComponent<Navigatior>();
         }
 
         private void Update()
         {
             _hasAnimator = TryGetComponent(out _animator);
 
-            JumpAndGravity();
-            GroundedCheck();
-            Move();
+            navigatior.DrawPath(targetPosition);
+
+            if (Keyboard.current[Key.LeftCtrl].wasPressedThisFrame)
+            {
+                cursorLocked = !cursorLocked;
+                UpdateCursorLock();
+
+            }
+            if (AreControllersEnabled())
+            {
+                JumpAndGravity();
+                GroundedCheck();
+                Move();
+            }
+        }
+
+        public void setTarget(Vector3 target)
+        {
+            if (targetPosition == null)
+            {
+                targetPosition = new Vector3(0, 0, 0);
+            }
+            else
+            {
+                targetPosition = target;
+            }
+        }
+
+        private void UpdateCursorLock()
+        {
+            if (cursorLocked)
+            {
+                Cursor.lockState = CursorLockMode.Locked;
+                EnableControllers();
+
+            }
+            else
+            {
+                Cursor.lockState = CursorLockMode.None;
+                DisableControllers();
+            }
+            Cursor.visible = !cursorLocked;
+        }
+
+        private void DisableControllers()
+        {
+            controllersEnabled = false;
+            navMeshAgent.enabled = true;
+        }
+
+        private void EnableControllers()
+        {
+            controllersEnabled = true;
+            navMeshAgent.enabled = false;
+        }
+
+        private bool AreControllersEnabled()
+        {
+            return controllersEnabled;
         }
 
         private void LateUpdate()
