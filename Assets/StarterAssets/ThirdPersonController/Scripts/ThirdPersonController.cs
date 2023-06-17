@@ -1,10 +1,10 @@
-﻿using UnityEngine;
+﻿/*using UnityEngine;
 #if ENABLE_INPUT_SYSTEM 
 using UnityEngine.InputSystem;
 #endif
 
-/* Note: animations are called via the controller for both the character and capsule using animator null checks
- */
+*//* Note: animations are called via the controller for both the character and capsule using animator null checks
+ *//*
 
 namespace StarterAssets
 {
@@ -125,6 +125,8 @@ namespace StarterAssets
 
         Vector3 targetPosition;
         private Navigatior navigatior;
+        bool frag = false;
+        bool check = true;
 
         private void Awake()
         {
@@ -168,8 +170,6 @@ namespace StarterAssets
         {
             _hasAnimator = TryGetComponent(out _animator);
 
-            navigatior.DrawPath(targetPosition);
-
             if (Keyboard.current[Key.LeftCtrl].wasPressedThisFrame)
             {
                 cursorLocked = !cursorLocked;
@@ -182,18 +182,32 @@ namespace StarterAssets
                 GroundedCheck();
                 Move();
             }
+
+            if (frag == true)
+            {
+                navigatior.DrawPath(targetPosition);
+
+            }
+        }
+
+        public void SetCheck()
+        {
+            check = false;
+        }
+
+        private void UpdateAnimator(float inputMagnitude, float velocityMagnitude)
+        {
+            // Cập nhật tham số Speed trong animator dựa trên tốc độ di chuyển
+            _animator.SetFloat("Speed", velocityMagnitude);
+
+            // Cập nhật tham số Move trong animator dựa trên tốc độ di chuyển và inputMagnitude
+            _animator.SetFloat("Move", inputMagnitude);
         }
 
         public void setTarget(Vector3 target)
         {
-            if (targetPosition == null)
-            {
-                targetPosition = new Vector3(0, 0, 0);
-            }
-            else
-            {
-                targetPosition = target;
-            }
+            targetPosition = target;
+            frag = true;
         }
 
         private void UpdateCursorLock()
@@ -457,4 +471,4 @@ namespace StarterAssets
             }
         }
     }
-}
+}*/

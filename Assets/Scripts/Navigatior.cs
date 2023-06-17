@@ -1,4 +1,4 @@
-﻿using StarterAssets;
+﻿/*using StarterAssets;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
@@ -18,8 +18,12 @@ public class Navigatior : MonoBehaviour
 
     public float distanceThreshold = 1f;
     public LayerMask groundLayer;
+
+    private bool isLineVisible = false;
     private void Start()
     {
+        List<Dropdown.OptionData> options = new List<Dropdown.OptionData>();
+
         navMeshAgent = GetComponent<NavMeshAgent>();
 
         lineRenderer.enabled = true;
@@ -27,16 +31,20 @@ public class Navigatior : MonoBehaviour
         lineRenderer.endWidth = 0.15f;
         lineRenderer.positionCount = 0;
 
-        objectPositions.Add(new Vector3(-84f, 7f, -14f));
-        objectPositions.Add(new Vector3(-56f, 2f, 35f));
 
-        // Xác định số lượng vị trí và tạo danh sách tùy chọn cho Dropdown
-        List<Dropdown.OptionData> options = new List<Dropdown.OptionData>();
+        objectPositions = new List<Vector3>()
+    {
+        new Vector3(9f, 10f, 30f),
+        new Vector3(-56f, 2f, 35f),
+        new Vector3(3f, 3f, 3f)
+    };
 
         for (int i = 0; i < objectPositions.Count; i++)
         {
             Dropdown.OptionData option = new Dropdown.OptionData();
-            option.text = "Position " + i.ToString();
+
+            option.text = "phòng " + (i + 1); ;
+
             options.Add(option);
         }
 
@@ -44,66 +52,48 @@ public class Navigatior : MonoBehaviour
         positionDropdown.ClearOptions();
         positionDropdown.AddOptions(options);
 
-
         togglePathButton.onClick.AddListener(TogglePathVisibility);
         positionDropdown.onValueChanged.AddListener(delegate { OnDropdownValueChanged(positionDropdown); });
     }
 
+
     public void DrawPath(Vector3 targetPosition)
     {
-        /*Vector3[] positions = new Vector3[2];
-        positions[0] = transform.position; // Vị trí hiện tại của nhân vật
-        positions[1] = targetPosition; // Tọa độ đích
-
-        lineRenderer.positionCount = positions.Length;
-        lineRenderer.SetPositions(positions);*/
-
-        // Tạo một đường đi trên NavMesh
+        //chỉ show line dưới chân, không di chuyển
         NavMeshPath path = new NavMeshPath();
         if (NavMesh.CalculatePath(transform.position, targetPosition, NavMesh.AllAreas, path))
         {
             Vector3[] corners = path.corners;
+
+            // Cập nhật số lượng điểm trong LineRenderer
             lineRenderer.positionCount = corners.Length;
 
-            for (int i = 0; i < corners.Length; i++)
-            {
-                Vector3 corner = corners[i];
+            // Cập nhật tọa độ các điểm trong LineRenderer
+            lineRenderer.SetPositions(corners);
 
-                // Kiểm tra xem điểm có tiếp xúc với mặt đất hay không
-                RaycastHit hit;
-                if (Physics.Raycast(corner + Vector3.up * 10f, Vector3.down, out hit, 100f, groundLayer))
-                {
-                    // Điểm tiếp xúc với mặt đất
-                    lineRenderer.SetPosition(i, hit.point);
-                }
-                else
-                {
-                    // Điểm ẩn
-                    lineRenderer.SetPosition(i, corner);
-                }
-            }
+            isLineVisible = true;
+
+            navMeshAgent.SetDestination(targetPosition);
         }
 
-        float distance = Vector3.Distance(transform.position, targetPosition);
-        if (distance < distanceThreshold)
+        if (isLineVisible && !navMeshAgent.pathPending && navMeshAgent.remainingDistance <= navMeshAgent.stoppingDistance)
         {
-            // Tắt LineRenderer
-            lineRenderer.enabled = false;
-        }
-        else
-        {
-            // Bật LineRenderer
-            lineRenderer.enabled = true;
+            // Xóa LineRenderer
+            lineRenderer.positionCount = 0;
+
+            isLineVisible = false;
+
+            thirdPersonController.SetCheck();
         }
     }
 
 
     private void OnDropdownValueChanged(Dropdown dropdown)
     {
-        /*        if (isPathVisible)
+        *//*        if (isPathVisible)
                 {
                     UpdatePath(dropdown.value);
-                }*/
+                }*//*
         Debug.Log("vi tri: " + dropdown.value + 1);
         int vitri = dropdown.value;
         Vector3 valueSelectedPostion = objectPositions[vitri];
@@ -111,40 +101,11 @@ public class Navigatior : MonoBehaviour
         thirdPersonController.setTarget(valueSelectedPostion);
     }
 
-    private void UpdatePath(int targetIndex)
-    {
-        Vector3 targetPosition = objectPositions[targetIndex];
-        navMeshAgent.SetDestination(targetPosition);
-
-        if (isPathVisible)
-        {
-            ShowLineRenderer(targetPosition);
-        }
-    }
-
-    private void ShowLineRenderer(Vector3 targetPosition)
-    {
-
-        Vector3[] positions = new Vector3[2];
-        positions[0] = transform.position; // Vị trí hiện tại của nhân vật
-        positions[1] = targetPosition; // Tọa độ đích
-
-        lineRenderer.positionCount = positions.Length;
-        lineRenderer.SetPositions(positions);
-
-    }
 
     private void TogglePathVisibility()
     {
         lineRenderer.enabled = !lineRenderer.enabled;
         Debug.Log(lineRenderer.enabled);
     }
-
-    public void SetDestination(Vector3 destination)
-    {
-        if (isPathVisible)
-        {
-            navMeshAgent.SetDestination(destination);
-        }
-    }
 }
+*/

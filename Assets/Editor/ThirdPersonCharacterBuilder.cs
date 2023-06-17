@@ -1,4 +1,4 @@
-using Cinemachine;
+/*using Cinemachine;
 using StarterAssets;
 using UnityEditor;
 using UnityEditor.SceneManagement;
@@ -77,4 +77,4 @@ public static class ThirdPersonCharacterBuilder
             camera.LookAt = cameraTarget.transform;
         }
     }
-}
+}*/
